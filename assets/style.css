@@ -111,7 +111,7 @@ legend { font-weight: 650; font-size: 13px; padding: 0 4px; }
 .tabs button.aktif { color: var(--ink); border-bottom-color: var(--brand); }
 .pil { background: var(--flag); color: #fff; border-radius: 999px; font-size: 11px; padding: 0 7px; font-weight: 700; }
 
-.tab { padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 14px; max-width: 1500px; margin: 0 auto; }
+.tab { padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 14px; }
 .kartu { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; min-width: 0; }
 .kepala-kartu { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
 .kepala-kartu h2 { margin: 0; }
