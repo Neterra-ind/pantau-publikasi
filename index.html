@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantau Publikasi</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<!-- ============ masuk ============ -->
+<main id="layar-masuk" class="masuk" hidden>
+  <form id="form-masuk" class="kartu masuk-kartu">
+    <div class="brand"><span class="brand-mark"></span><h1>Pantau Publikasi</h1></div>
+    <p class="muted">Masuk dengan email admin atau operator.</p>
+    <label>Email<input type="email" name="email" autocomplete="username" required></label>
+    <label>Kata sandi<input type="password" name="sandi" autocomplete="current-password" required></label>
+    <p class="galat" id="galat-masuk" hidden></p>
+    <button class="btn utama" type="submit">Masuk</button>
+    <p class="muted kecil">Akun awal data simulasi ada di <code>data/akun_awal.txt</code>.</p>
+  </form>
+</main>
+
+<!-- ============ aplikasi ============ -->
+<div id="layar-app" hidden>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" id="brand-mark"></span><h1>Pantau Publikasi</h1>
+      <span class="badge-sim" id="badge-sim" hidden>Data simulasi</span></div>
+    <div class="pemilih">
+      <label class="sr" for="pilih-klien">Klien</label>
+      <select id="pilih-klien" title="Klien"></select>
+      <label class="sr" for="pilih-periode">Periode</label>
+      <select id="pilih-periode" title="Periode"></select>
+      <button class="btn kecil" id="btn-periode" title="Tambah periode">+ Periode</button>
+      <span class="simpan" id="status-simpan" aria-live="polite"></span>
+    </div>
+    <div class="akun">
+      <button class="btn ikon" id="btn-tema" title="Ganti tema terang/gelap" aria-label="Ganti tema">◐</button>
+      <span id="nama-pengguna" class="muted"></span>
+      <button class="btn kecil" id="btn-reset-demo" hidden title="Data demo hanya tersimpan di browser ini">Mode demo · Reset data</button>
+      <button class="btn kecil" id="btn-keluar">Keluar</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="ringkasan" class="aktif">Ringkasan</button>
+    <button role="tab" data-tab="data">Data <span class="pil" id="pil-cek" hidden></span></button>
+    <button role="tab" data-tab="target">Target</button>
+    <button role="tab" data-tab="ekspor">Ekspor</button>
+    <button role="tab" data-tab="pengaturan">Pengaturan</button>
+  </nav>
+
+  <!-- ---------- Ringkasan ---------- -->
+  <section id="tab-ringkasan" class="tab">
+    <div class="kpi" id="kpi"></div>
+    <div class="grid2">
+      <div class="kartu">
+        <div class="kepala-kartu"><h2>Laju kumulatif harian</h2>
+          <div class="seg" id="seg-laju">
+            <button data-m="publikasi" class="aktif">Publikasi</button><button data-m="views">Views</button><button data-m="interaksi">Interaksi</button>
+          </div></div>
+        <div class="chart-box"><canvas id="chart-laju" aria-label="Grafik laju kumulatif harian"></canvas></div>
+        <p class="muted kecil" id="ket-laju"></p>
+      </div>
+      <div class="kartu">
+        <h2>Per platform</h2>
+        <div class="tabel-wrap"><table class="tbl" id="tbl-platform"></table></div>
+      </div>
+    </div>
+    <div class="kartu">
+      <h2>Target dan realisasi</h2>
+      <div class="tabel-wrap"><table class="tbl" id="tbl-target"></table></div>
+    </div>
+    <div class="grid2">
+      <div class="kartu">
+        <h2 id="judul-kelompok">Per kelompok</h2>
+        <div class="tabel-wrap tinggi"><table class="tbl" id="tbl-kelompok"></table></div>
+      </div>
+      <div class="kartu">
+        <div class="kepala-kartu"><h2>Akun paling aktif</h2>
+          <div class="seg" id="seg-akun">
+            <button data-m="posts" class="aktif">Postingan</button><button data-m="views">Views</button><button data-m="interaksi">Interaksi</button><button data-m="er">ER</button>
+          </div></div>
+        <div class="tabel-wrap tinggi"><table class="tbl" id="tbl-akun"></table></div>
+      </div>
+    </div>
+    <div class="kartu">
+      <h2>Konten views tertinggi</h2>
+      <div class="tabel-wrap"><table class="tbl" id="tbl-teratas"></table></div>
+    </div>
+  </section>
+
+  <!-- ---------- Data ---------- -->
+  <section id="tab-data" class="tab" hidden>
+    <div class="kartu">
+      <div class="filter" id="filter">
+        <select id="f-platform" title="Platform"><option value="">Semua platform</option></select>
+        <select id="f-kelompok" title="Kelompok"></select>
+        <select id="f-akun" title="Akun"></select>
+        <select id="f-jenis" title="Jenis"><option value="">Semua jenis</option><option>Video</option><option>Flyer</option><option>Artikel</option></select>
+        <label class="tgl">Dari <input type="date" id="f-dari"></label>
+        <label class="tgl">s.d. <input type="date" id="f-sampai"></label>
+        <label class="cek"><input type="checkbox" id="f-dicek"> Perlu dicek</label>
+        <input type="search" id="f-cari" placeholder="Cari judul, akun, kelompok, link">
+        <button class="btn kecil" id="btn-reset">Reset</button>
+      </div>
+      <div class="aksi">
+        <button class="btn utama" id="btn-tempel">Tempel link / baris Excel</button>
+        <button class="btn" id="btn-baris">+ Baris</button>
+        <button class="btn" id="btn-impor">Impor workbook (.xlsx)</button>
+        <button class="btn" id="btn-rapikan">Rapikan nama</button>
+        <button class="btn" id="btn-unduh">Unduh data terfilter</button>
+        <button class="btn bahaya" id="btn-hapus" disabled>Hapus terpilih</button>
+        <span class="muted" id="info-data"></span>
+      </div>
+      <div class="tabel-wrap data-wrap">
+        <table class="tbl data" id="tbl-data">
+          <thead></thead><tbody></tbody><tfoot></tfoot>
+        </table>
+      </div>
+      <div class="halaman" id="halaman"></div>
+    </div>
+  </section>
+
+  <!-- ---------- Target ---------- -->
+  <section id="tab-target" class="tab" hidden>
+    <div class="kartu">
+      <div class="kepala-kartu"><h2>Target periode</h2><span class="muted" id="sumber-target"></span></div>
+      <p class="muted kecil">Kosongkan isian yang tidak dinilai. ER ditulis dalam persen (mis. 3 atau 2,5) dan diperlakukan sebagai batas minimum.</p>
+      <form id="form-target">
+        <fieldset><legend>Jumlah postingan per platform</legend><div class="isian" id="t-posts"></div></fieldset>
+        <fieldset><legend>Total</legend><div class="isian">
+          <label>Total views<input name="views" inputmode="numeric"></label>
+          <label>Total interaksi<input name="interactions" inputmode="numeric"></label>
+          <label>ER total minimum (%)<input name="er" inputmode="decimal"></label>
+        </div></fieldset>
+        <fieldset><legend>ER minimum per platform (%)</legend><div class="isian" id="t-er"></div></fieldset>
+        <fieldset><legend id="leg-kuota-kel">Kuota per kelompok</legend><div class="isian kuota" id="t-kelompok"></div>
+          <div class="baris-tambah"><input id="t-kel-nama" placeholder="Nama (bila belum ada di data)"><button class="btn kecil" type="button" id="t-kel-tambah">Tambah</button></div></fieldset>
+        <fieldset><legend>Kuota per akun</legend><div class="isian kuota" id="t-akun"></div>
+          <div class="baris-tambah"><input id="t-akun-nama" placeholder="Nama akun" list="dl-akun"><datalist id="dl-akun"></datalist><button class="btn kecil" type="button" id="t-akun-tambah">Tambah</button></div></fieldset>
+        <div class="aksi" id="aksi-target">
+          <button class="btn utama" type="submit">Simpan untuk periode ini</button>
+          <button class="btn" type="button" id="btn-target-bawaan">Simpan sebagai target bawaan klien</button>
+          <button class="btn" type="button" id="btn-target-salin">Salin dari bulan lalu</button>
+          <button class="btn" type="button" id="btn-target-reset">Pakai bawaan klien</button>
+        </div>
+        <p class="muted" id="target-ro" hidden>Hanya admin yang bisa mengubah target.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ---------- Ekspor ---------- -->
+  <section id="tab-ekspor" class="tab" hidden>
+    <div class="kartu">
+      <h2>Ekspor laporan</h2>
+      <div id="peringatan-ekspor" class="peringatan" hidden></div>
+      <div class="ekspor-grid">
+        <div class="ekspor-item"><h3>Laporan Excel</h3>
+          <p class="muted">Ringkasan dengan rumus hidup, lembar per kelompok dan per akun (COUNTIF/SUMIF), lembar per platform, dan Catatan Data. Sel target berwarna kuning bisa diisi.</p>
+          <button class="btn utama" id="dl-xlsx">Unduh .xlsx</button></div>
+        <div class="ekspor-item"><h3>Laporan PowerPoint</h3>
+          <p class="muted">16:9, warna dan logo klien, grafik asli PowerPoint (datanya bisa diedit), link konten bisa diklik.</p>
+          <button class="btn utama" id="dl-pptx">Unduh .pptx</button></div>
+        <div class="ekspor-item"><h3>Data terfilter</h3>
+          <p class="muted">Dari tab Data: persis baris yang sedang tampil, dengan judul filter, kolom catatan masalah, dan total SUBTOTAL.</p>
+          <button class="btn" id="btn-ke-data">Buka tab Data</button></div>
+        <div class="ekspor-item"><h3>Template workbook</h3>
+          <p class="muted">Workbook kosong berlembar IG, TikTok, Facebook, YouTube, Berita untuk diisi lalu diimpor.</p>
+          <button class="btn" id="dl-template" data-url="/api/template">Unduh template</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- Pengaturan ---------- -->
+  <section id="tab-pengaturan" class="tab" hidden>
+    <div class="grid2">
+      <div class="kartu">
+        <div class="kepala-kartu"><h2>Klien</h2><button class="btn kecil" id="btn-klien-baru">+ Klien baru</button></div>
+        <form id="form-klien">
+          <input type="hidden" name="id">
+          <label>Nama klien<input name="nama" required></label>
+          <label>Istilah kelompok (mis. DPC, Wilayah, Cabang)<input name="label_kelompok"></label>
+          <label class="cek"><input type="checkbox" name="pakai_kelompok"> Pakai kelompok</label>
+          <label>Warna<input type="color" name="warna"></label>
+          <div class="logo-baris"><img id="logo-pratinjau" alt="Logo klien" hidden>
+            <label class="btn kecil">Unggah logo<input type="file" id="logo-file" accept="image/png,image/jpeg" hidden></label>
+            <button class="btn kecil" type="button" id="logo-hapus">Hapus logo</button></div>
+          <div class="aksi"><button class="btn utama" type="submit">Simpan klien</button>
+            <button class="btn bahaya" type="button" id="btn-klien-hapus">Hapus klien…</button></div>
+        </form>
+        <h3>Aturan nama (lama = baku)</h3>
+        <p class="muted kecil">Dijalankan lebih dulu saat tempel, impor, dan Rapikan nama.</p>
+        <div id="daftar-alias"></div>
+      </div>
+      <div class="kartu" id="kartu-pengguna">
+        <h2>Pengguna</h2>
+        <div class="tabel-wrap"><table class="tbl" id="tbl-pengguna"></table></div>
+        <form id="form-pengguna" class="form-kecil">
+          <h3>Tambah / ubah pengguna</h3>
+          <label>Email<input name="email" type="email" required></label>
+          <label>Nama<input name="nama"></label>
+          <label>Peran<select name="peran"><option value="operator">Operator</option><option value="admin">Admin</option></select></label>
+          <label>Kata sandi (baru / awal, min. 8)<input name="sandi" type="password" autocomplete="new-password"></label>
+          <div id="pengguna-klien" class="cek-daftar"></div>
+          <button class="btn utama" type="submit">Simpan pengguna</button>
+        </form>
+      </div>
+    </div>
+    <div class="kartu">
+      <h2>Ganti kata sandi saya</h2>
+      <form id="form-sandi" class="isian">
+        <label>Kata sandi lama<input type="password" name="lama" autocomplete="current-password" required></label>
+        <label>Kata sandi baru<input type="password" name="baru" autocomplete="new-password" required minlength="8"></label>
+        <div><button class="btn" type="submit">Ganti</button></div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<!-- ============ dialog ============ -->
+<dialog id="dlg" class="dlg">
+  <form method="dialog" class="dlg-isi" id="dlg-form">
+    <div class="kepala-kartu"><h2 id="dlg-judul"></h2><button class="btn ikon" value="batal" aria-label="Tutup">✕</button></div>
+    <div id="dlg-badan"></div>
+    <div class="aksi" id="dlg-aksi"></div>
+  </form>
+</dialog>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script src="assets/vendor/chart.umd.min.js"></script>
+<script src="assets/demo.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
